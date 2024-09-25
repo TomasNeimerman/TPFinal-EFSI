@@ -3,13 +3,15 @@ import { Link } from 'react-router-dom';
 import { useContext } from 'react';
 import Image from 'next/image';
 
+
+
 const Header = () => {
   
 
   return (
     <header className="bg-gray-800 text-white p-4 flex justify-between items-center">
       <div className="logo">
-        imaf
+        <Image src={logo}></Image>
         <Link to="/">Eventos</Link>
       </div>
       <nav>
