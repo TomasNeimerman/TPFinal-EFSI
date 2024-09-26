@@ -1,7 +1,7 @@
 // src/pages/Home.js
 "use client"
 import React, { useState, useEffect } from 'react';
-
+import Card from '../components/Card'
 const Home = () => {
   const [events, setEvents] = useState([]);
 
@@ -19,9 +19,7 @@ const Home = () => {
       <ul>
         {events.map(event => (
           <li key={event.id}>
-            <h2>{event.title}</h2>
-            <p>{event.description}</p>
-            <p>{event.date}</p>
+            <Card titulo={event.title} descripcion={event.description} fecha={event.date}></Card>
           </li>
         ))}
       </ul>

@@ -1,7 +1,8 @@
 // src/components/Footer.js
+import styles from './styles.module.css'
 const Footer = () => {
     return (
-      <footer className="bg-gray-800 text-white p-4 text-center">
+      <footer className={styles.body}>
         <p>&copy; 2024 Eventos App</p>
       </footer>
     );
