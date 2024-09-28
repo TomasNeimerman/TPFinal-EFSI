@@ -1,44 +1,68 @@
 // src/pages/Login.js
-"use client"
-import { useContext, useState } from 'react';
-
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Usamos useNavigate
 
 const Login = () => {
-
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const navigate = useNavigate(); // Inicializa el enrutador
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    // Verifica si ya hay un token en localStorage
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/'); // Redirige a la página principal si ya está logueado
+    }
+  }, [navigate]);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Aquí deberías llamar a la API de autenticación.
-    const userData = { name: 'Usuario Demo', email }; 
-    login(userData);
-    navigate('/');
+    setError('');
+
+    try {
+      const response = await axios.post('http://localhost:3508/api/user/login', {
+        username,
+        password,
+      });
+
+      if (response.data.success) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('username', response.data.username);
+        navigate('/home'); // Redirige a la página de inicio
+      } else {
+        setError(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+      setError("Ocurrió un error al intentar iniciar sesión.");
+    }
   };
 
   return (
-    <div className="login-page">
-      <h1>Iniciar Sesión</h1>
-      <form onSubmit={handleSubmit}>
-        <input 
-          type="email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          placeholder="Email" 
-          required 
+    <form onSubmit={handleLogin}>
+      <div>
+        <label>Nombre de Usuario:</label>
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
         />
-        <input 
-          type="password" 
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
-          placeholder="Contraseña" 
-          required 
+      </div>
+      <div>
+        <label>Contraseña:</label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
         />
-        <button type="submit">Ingresar</button>
-      </form>
-    </div>
+      </div>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <button type="submit">Iniciar Sesión</button>
+    </form>
   );
 };
 

@@ -1,33 +1,55 @@
 // src/pages/Register.js
-"use client"
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+"use client";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Asegúrate de que estás usando react-router-dom
 
 const Register = () => {
   const [name, setName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Inicializamos useNavigate
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
+    const trimmedPassword = password.trim();
+    const trimmedConfirmPassword = confirmPassword.trim();
+
+    if (trimmedPassword !== trimmedConfirmPassword) {
       setError('Las contraseñas no coinciden');
       return;
     }
 
-    // Aquí deberías hacer la llamada a la API de registro
-    // Simulamos el registro exitoso
-    const userData = { name, email }; // Simular creación de usuario en backend
+    try {
+      const response = await fetch('http://localhost:3508/api/user/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          first_name: name,
+          last_name: lastName,
+          username: email,
+          password: trimmedPassword,
+        }),
+      });
 
-    // Simular que el usuario ha sido registrado
-    console.log('Usuario registrado:', userData);
+      const data = await response.json();
 
-    // Navegar a la página de inicio (home) después de registrarse
-    navigate('/');
+      if (response.ok) {
+        console.log('Usuario registrado:', data);
+        // Redirigir a la página de login
+        navigate('/login'); // Asegúrate de que esta es la ruta correcta para Login.js
+      } else {
+        setError(data.message || 'Error en el registro');
+      }
+    } catch (error) {
+      console.error('Error durante el registro:', error);
+      setError('Error en la conexión con el servidor');
+    }
   };
 
   return (
@@ -39,6 +61,13 @@ const Register = () => {
           value={name} 
           onChange={(e) => setName(e.target.value)} 
           placeholder="Nombre" 
+          required 
+        />
+        <input 
+          type="text" 
+          value={lastName} 
+          onChange={(e) => setLastName(e.target.value)} 
+          placeholder="Apellido" 
           required 
         />
         <input 
