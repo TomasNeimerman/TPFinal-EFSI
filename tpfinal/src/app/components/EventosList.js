@@ -27,24 +27,7 @@ const EventosList = () => {
     if (!eventos.length) return <div>No hay eventos disponibles</div>;
 
     return (
-        <div>
-            {eventos.map((evento, index) => (
-                <div key={evento.id} style={{ marginBottom: '20px', border: '1px solid #ccc', padding: '10px' }}>
-                    <div style={{ fontWeight: 'bold', fontSize: '1.2em' }}>Evento: {index + 1}</div> {/* Número de evento */}
-                    
-                    <div style={{ fontWeight: 'bold', fontSize: '1.2em', marginTop: '10px' }}>Nombre:</div>
-                    <div>{evento.name}</div>
-
-                    <div style={{ fontWeight: 'bold', fontSize: '1.2em', marginTop: '10px' }}>Descripción:</div>
-                    <div>{evento.description}</div>
-
-                    <div style={{ fontWeight: 'bold', fontSize: '1.2em', marginTop: '10px' }}>Categorías:</div>
-                    <div>{evento.event_category.name}</div> {/* Cambié a la estructura correcta */}
-                    
-                    {/* Puedes agregar más campos de evento aquí siguiendo el mismo patrón */}
-                </div>
-            ))}
-        </div>
+       
     );
 };
 

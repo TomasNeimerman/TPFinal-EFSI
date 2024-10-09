@@ -2,6 +2,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // Asegúrate de que estás usando react-router-dom
+import styles from './form.module.css'
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -53,46 +54,63 @@ const Register = () => {
   };
 
   return (
-    <div className="register-page">
+    <div className={styles.formContainer}>
       <h1>Registro de Usuario</h1>
       <form onSubmit={handleSubmit}>
+        <div className={styles.form}>
+        <div className={styles.formGroup}>
         <input 
           type="text" 
           value={name} 
           onChange={(e) => setName(e.target.value)} 
-          placeholder="Nombre" 
+          placeholder="Nombre"   
           required 
+          
         />
+        </div>
+        <div className={styles.formGroup}>
         <input 
           type="text" 
           value={lastName} 
           onChange={(e) => setLastName(e.target.value)} 
           placeholder="Apellido" 
           required 
+          
         />
+        </div>
+        <div className={styles.formGroup}>
         <input 
           type="email" 
           value={email} 
           onChange={(e) => setEmail(e.target.value)} 
           placeholder="Correo Electrónico" 
           required 
+          className={styles.formGroup}
         />
+        </div>
+        <div className={styles.formGroup}>
         <input 
           type="password" 
           value={password} 
           onChange={(e) => setPassword(e.target.value)} 
           placeholder="Contraseña" 
-          required 
+          required
+          className={styles.formGroup} 
         />
+        </div>
+        <div className={styles.formGroup}>
         <input 
           type="password" 
           value={confirmPassword} 
           onChange={(e) => setConfirmPassword(e.target.value)} 
           placeholder="Confirmar Contraseña" 
           required 
+          className={styles.formGroup}
         />
+        </div>
         {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit">Registrarse</button>
+        <button type="submit" className={styles.submitButton}>Registrarse</button>
+        </div>
       </form>
     </div>
   );

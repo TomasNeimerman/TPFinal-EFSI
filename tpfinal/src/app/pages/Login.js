@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Usamos useNavigate
+import styles from './form.module.css'
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -41,9 +42,10 @@ const Login = () => {
   };
 
   return (
-    <form onSubmit={handleLogin}>
-      <div>
-        <label>Nombre de Usuario:</label>
+    <div className={styles.formContainer}>
+    <form onSubmit={handleLogin} className={styles.form}>
+      <label>Nombre de Usuario:</label>
+      <div className={styles.formGroup}>
         <input
           type="text"
           value={username}
@@ -51,8 +53,9 @@ const Login = () => {
           required
         />
       </div>
-      <div>
-        <label>Contraseña:</label>
+      <label>Contraseña:</label>
+      <div className={styles.formGroup}>
+        
         <input
           type="password"
           value={password}
@@ -61,8 +64,9 @@ const Login = () => {
         />
       </div>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button type="submit">Iniciar Sesión</button>
+      <button type="submit" className={styles.submitButton}>Iniciar Sesión</button>
     </form>
+    </div>
   );
 };
 

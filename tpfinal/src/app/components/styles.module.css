@@ -1,6 +1,6 @@
 /* Header.module.css */
 .body {
-    background-color: orange; /* bg-gray-800 */
+    background-color: rgb(0, 132, 255); /* bg-gray-800 */
     color: white; /* text-white */
     padding: 1rem; /* p-4 */
     display: flex; /* flex */
