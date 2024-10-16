@@ -2,7 +2,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // Asegúrate de que estás usando react-router-dom
-import styles from './form.module.css'
+import styles from '../styles/form.module.css'
 
 const Register = () => {
   const [name, setName] = useState('');

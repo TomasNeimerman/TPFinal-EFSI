@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Image from 'next/image';
 import logo from '../img/logo.png';
 import { useNavigate } from 'react-router-dom';
-import styles from './styles.module.css';
+import styles from '../styles/styles.module.css';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const Header = () => {
   return (
     <header className={styles.body}>
       <div className={styles.logo}>
-        <Link to="/">
+        <Link to="/Home">
           <Image src={logo} alt="Logo" />
         </Link>
       </div>

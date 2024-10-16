@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Usamos useNavigate
-import styles from './form.module.css'
+import styles from '../styles/form.module.css'
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -14,7 +14,7 @@ const Login = () => {
     // Verifica si ya hay un token en localStorage
     const token = localStorage.getItem('token');
     if (token) {
-      navigate('/'); // Redirige a la página principal si ya está logueado
+      navigate('/'); // Redirige a la página aprincipal si ya está logueado
     }
   }, [navigate]);
 
@@ -31,7 +31,7 @@ const Login = () => {
       if (response.data.success) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('username', response.data.username);
-        navigate('/home'); // Redirige a la página de inicio
+        navigate('/Home'); // Redirige a la página de inicio
       } else {
         setError(response.data.message);
       }
