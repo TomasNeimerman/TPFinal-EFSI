@@ -24,7 +24,7 @@ const EventosList = () => {
 
         fetchEventos();
     }, []);
-
+    console.log(eventos )
     if (error) return <div>{error}</div>;
     if (!eventos.length) return <div>No hay eventos disponibles</div>;
     return <Carousel eventos={eventos} />;

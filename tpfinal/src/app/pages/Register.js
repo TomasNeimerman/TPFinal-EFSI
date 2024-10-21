@@ -43,7 +43,7 @@ const Register = () => {
       if (response.ok) {
         console.log('Usuario registrado:', data);
         // Redirigir a la página de login
-        navigate('/login'); // Asegúrate de que esta es la ruta correcta para Login.js
+        navigate('/'); // Asegúrate de que esta es la ruta correcta para Login.js
       } else {
         setError(data.message || 'Error en el registro');
       }

@@ -27,7 +27,11 @@ const EventForm = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('http://localhost:3508/api/event-category');
+        const response = await axios.get('http://localhost:3508/api/event-category',{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setCategories(response.data); // Suponiendo que la respuesta es un array de categorías
       } catch (error) {
         console.error('Error al cargar las categorías:', error);
@@ -46,7 +50,7 @@ const EventForm = () => {
     fetchCategories();
     fetchLocations();
   }, []);
-
+console.log(locations)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -91,7 +95,8 @@ const EventForm = () => {
       setError('Error al crear el evento.');
     }
   };
-
+console.log(categories)
+console.log(locations)
   return (
     <div className={styles.formContainer}>
       <form onSubmit={handleSubmit} className={styles.form}>
@@ -122,11 +127,11 @@ const EventForm = () => {
             required
           >
             <option value="">Selecciona una categoría</option>
-            {categories.map((category) => (
+              {Array.isArray(categories) && categories.map((category) => (
               <option key={category.id} value={category.id}>
-                {category.name}
+              {category.name}
               </option>
-            ))}
+))}
           </select>
         </div>
 
