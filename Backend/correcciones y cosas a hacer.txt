@@ -1,0 +1,12 @@
+repositories:
+Punto 7: Delete: Confirmar que el id exista
+agregar a punto 8 reposirtory "where id_creator_user = req.body.id"
+funciones events x enrollments:
+excedeAsistencia: el max assistance de un evento es mayor al max capacity de un event-location
+maxExceed: si los registrados(rows en la lista) supera la max capacity no se puede registrar
+datePast: Si ya paso la fecha o es hoy, no se puede registrar
+noFinalizo: EL EVENTO NO FINALIZO
+noHabilitado: no esta habilitado para la inscripcion
+yaRegistrado: El usuario ya esta registrado al evento
+noRegistrado: El usuario no se encuentra registrado
+ESTADO REGISTRO: noRegistrado y yaRegistrado

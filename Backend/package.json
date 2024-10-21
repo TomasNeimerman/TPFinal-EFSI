@@ -1,0 +1,24 @@
+{
+  "name": "eventsos",
+  "version": "1.0.0",
+  "description": "eventss",
+  "main": "controller.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "node": "^20.15.0",
+    "nodemon": "^3.1.0",
+    "pg": "^8.12.0",
+    "postman": "^0.2.0",
+    "start": "^5.1.0"
+  }
+}
