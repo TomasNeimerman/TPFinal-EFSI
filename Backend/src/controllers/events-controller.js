@@ -1,6 +1,6 @@
 import express from "express";
 import EventsService from "../servicios/events-service.js";
-import { authMiddleware } from "../utils/auth-utils.js";
+import AuthMiddleware from "../auth/AuthMiddleware.js"; 
 import Validaciones from "../utils/validaciones-utils.js";
 
 const router = express.Router();
@@ -76,7 +76,7 @@ router.get("/:id/enrollment", async(request, respose) => {
     })
 
 //punto 8
-router.post("/", authMiddleware, async (request, response) => {
+router.post("/", AuthMiddleware, async (request, response) => {
   try {
     const name = request.body.name;
     const description = request.body.description;
@@ -105,7 +105,7 @@ router.post("/", authMiddleware, async (request, response) => {
     response.status(500).json({ message: "Error interno del servidor" });
   }
 });
-router.put("/:id", authMiddleware, async (request, response) => {
+router.put("/:id", AuthMiddleware, async (request, response) => {
   try {
     const id = request.params.id;
 
@@ -138,7 +138,7 @@ router.put("/:id", authMiddleware, async (request, response) => {
     response.status(500).json({ message: "Error interno del servidor" });
   }
   });
-router.delete("/:id", authMiddleware, async (request, response) => {
+router.delete("/:id", AuthMiddleware, async (request, response) => {
   try {
     const id = request.params.id;
     if (await !validaciones.existeObjeto(`events`, id)) {
@@ -158,7 +158,7 @@ router.delete("/:id", authMiddleware, async (request, response) => {
 
 //punto 9
 
-router.post("/:id/enrollment", authMiddleware, async (request, response) => {
+router.post("/:id/enrollment", AuthMiddleware, async (request, response) => {
   const id_event = request.params.id
   const id_user = request.user.id
   const description = request.query.description
@@ -176,7 +176,7 @@ router.post("/:id/enrollment", authMiddleware, async (request, response) => {
   }
 });
 
-router.delete("/:id/enrollment", authMiddleware, async (request, response) => {
+router.delete("/:id/enrollment", AuthMiddleware, async (request, response) => {
   const id_event = request.params.id
   const id_user = request.user.id
   try {
@@ -189,7 +189,7 @@ router.delete("/:id/enrollment", authMiddleware, async (request, response) => {
 });
 
 //punto 10
-router.patch("/:id/enrollment/:rating", authMiddleware, async (request, response) => {
+router.patch("/:id/enrollment/:rating", AuthMiddleware, async (request, response) => {
  
     try {
       const { id, rating } = request.params;

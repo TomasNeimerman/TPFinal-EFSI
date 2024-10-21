@@ -1,6 +1,6 @@
 import express from "express";
 import LocationService from "./../servicios/location-service.js";
-import { authMiddleware } from "../utils/auth-utils.js";
+import AuthMiddleware from "../auth/AuthMiddleware.js"; 
 import Validaciones from "../utils/validaciones-utils.js";
 const locationService = new LocationService();
 const router = express.Router();
@@ -33,7 +33,7 @@ router.get("/:id", async (request, response) => {
       response.status(500).json({ message: "Error interno del servidor" });
     }
   });
-  router.get("/:id/event-location", authMiddleware, async (request, response)=> {
+  router.get("/:id/event-location", AuthMiddleware, async (request, response)=> {
     try{
       const pageSize = request.query.limit;
       const page = request.query.offset;

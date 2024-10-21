@@ -1,31 +1,50 @@
-import jwt from 'jsonwebtoken';
-import UsersRepository from '../repositories/users-repository.js';  
+import Bd from "../repositories/users-repository.js";
+const bd = new Bd();
 
-export default class UsersService {
-    crearUsuario = async (first_name, last_name, username, password) => {
-      const repo = new UsersRepository();
-      return await repo.crearUsuario(first_name, last_name, username, password);
+
+export default class UsuarioServicios {
+    async login(username, password) {
+        try {
+            const usuario = await bd.buscarUsuarioPorUsername(username);
+            if (usuario.length <= 0) {
+                return 400
+            }   
+            if (password != usuario[0].password) {
+                return 401
+            }
+            return usuario
+        } catch (error) {
+            console.error('Error durante el inicio de sesión:', error);
+            throw new Error('Error interno del servidor');
+        }
+    }   
+
+
+    async cheqUser(first_name, last_name, username, password){
+        if (first_name.length < 3 || last_name.length < 3) {
+            return("Los campos first_name o last_name deben tener al menos tres caracteres.");
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(username)) {
+            return("El email es inválido.");
+        }
+        if (password.length < 3) {
+           return("El campo password debe tener al menos tres caracteres.");
+        }
+        const existingUser = await bd.buscarUsuarioPorUsername(username);
+        if(existingUser[0] != null){
+            return("Usuario ya existente")
+        }
+        return true
     }
-  
-    recibirToken = async (username, password) => {
-      const repo = new UsersRepository();
-      const validarUsuario = await repo.usuarioExiste(username, password); 
-      if (validarUsuario) {
-        const token = this.generarToken(validarUsuario[0].id, validarUsuario[0].username); 
-        return [token.token, validarUsuario[0].username];  // Asegúrate de que estás pasando el username correcto
-      } else {
-        return false;
-      }
-  }
-      generarToken = (id, username) => {
-        const payload = { id, username };
-        const secretKey = 'UmDoisTreisTriesDoisUmoTodoMundoSobreDoisRaizEmCadaUno';
-        const options = { expiresIn: "4 Hours", issuer: 'santiago' };
-        return jwt.sign(payload, secretKey, options);
-      }
-      validarMail = (email) => {
-        const regex = /^[\w.%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-        return regex.test(email);
-      }
-    
+
+    async register(firstName, lastName, username, password) {
+        try {
+            const userId = await bd.autenticarRegistro(firstName, lastName, username, password);
+            return { success: true, message: 'Usuario creado con éxito.', userId: userId};
+        } catch (error) {
+            console.error('Error durante el registro de usuario:');
+            throw new Error('Error interno del servidor');
+        }
+    }
 }

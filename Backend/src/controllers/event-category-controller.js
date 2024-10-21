@@ -20,17 +20,19 @@ router.post("/", async (request, response) => {
     response.status(500).json({ message: "Error interno del servidor" });
   }});
     
-router.get("/", async (request, response) => {
-      try {
-        const pageSize = request.query.limit;
-        const page = request.query.offset;
-        const categorias = await eventcategoryService.getAllCategories(pageSize, page);
-        return response.status(200).json(categorias);
-      } catch (error) {
-        console.error("Error al obtener todas las categorias:", error);
-        response.status(500).json({ message: "Error interno del servidor" });
-      }
-    });
+  router.get("/", async (request, response) => {
+    try {
+      const pageSize = request.query.limit;
+      const page = request.query.offset;
+      const categorias = await eventcategoryService.getAllCategories(pageSize, page);
+      console.log(categorias.collection);
+      return response.status(200).json(categorias.collection); 
+    } catch (error) {
+      console.error("Error al obtener todas las categorías:", error);
+      response.status(500).json({ message: "Error interno del servidor" });
+    }
+  });
+  
     router.get("/:id", async (request, response) => {
         try {
           const id = request.params.id;

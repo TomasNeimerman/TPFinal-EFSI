@@ -1,36 +1,59 @@
-import pg from "pg";
-import { DBconfig } from "../../database/DB.js";
+import pg from 'pg';
+import { DBconfig } from '../../database/DB.js';
 
-export default class UsersRepository {
-  constructor() {
-    const { Client } = pg;
-    this.DBClient = new Client(DBconfig);
-    this.DBClient.connect();
-  }
-
-  async crearUsuario(first_name, last_name, username, password) {
-    await this.DBClient.query(`SELECT setval('users_id_seq', (SELECT COALESCE(MAX(id), 0) FROM users) + 1);`);
-    const sql = `INSERT INTO users (id, first_name, last_name, username, password)
-                 VALUES (nextval('users_id_seq'), '${first_name}', '${last_name}', '${username}', '${password}')
-                 RETURNING *;`;
-    console.log(sql);
-    const response = await this.DBClient.query(sql);
-    console.log(`Usuario '${username}' creado correctamente`);
-    return response.rows;
-  }
-
-  async usuarioExiste(username, password) {
-    const sql = `SELECT * 
-                 FROM users 
-                 WHERE username = '${username}' 
-                 AND password = '${password}';`;
-    console.log(sql);
-    const response = await this.DBClient.query(sql);
-    
-    if (response.rows.length === 0) {
-      return false;
-    } else {
-      return response.rows;
+export default class Bd {
+    constructor() {
+        const {Client} = pg;
+        this.client = new pg.Client(DBconfig);
+        this.client.connect();
     }
-  }
+
+     async autenticarUsuario(username, password) {
+        const sql = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}' `;        
+        try {
+            const respuesta = await this.client.query(sql);
+            return respuesta.rows;
+        } catch (error) {
+            console.error("Error al autenticar usuario:", error);
+            throw new Error("Error al autenticar usuario");
+        }
+    }
+
+    async autenticarRegistro(first_name, last_name, username, password) {
+        const num = await this.cantUsuarios()
+        let id = parseInt(num[0].count)
+        const sql = `INSERT INTO users (id, first_name, last_name, username, password)
+            VALUES ('${id+1}', '${first_name}', '${last_name}', '${username}', '${password}')
+            RETURNING id`;
+            console.log(sql)
+        try {
+            const respuesta = await this.client.query(sql);
+            return respuesta.rows[0].id;
+        } catch (error) {
+            console.error("Error al registrar usuario:", error);
+            throw new Error("Error al registrar usuario");
+        }
+    }
+
+    async buscarUsuarioPorUsername(username) {
+        const sql = `SELECT * FROM users WHERE username = '${username}' `
+        try {
+            const respuesta = await this.client.query(sql);
+            return respuesta.rows;
+        } catch (error) {
+            console.error("Error al buscar usuario por nombre de usuario:", error);
+            throw new Error("Error al buscar usuario por nombre de usuario");
+        }
+    }
+
+    async cantUsuarios(){
+        const sql = `SELECT COUNT(*) FROM users`
+        try{
+            const num = await this.client.query(sql)
+            return num.rows
+        } catch(error){
+            console.error("Error contando usuarios")
+            return("Error contando usuarios")
+        }
+    }
 }

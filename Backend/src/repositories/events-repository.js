@@ -84,9 +84,6 @@ export default class EventRepository{
         WHERE 1=1 ${queryAgregado}
         LIMIT ${pageSize} OFFSET ${page};
     `;
-    
-    
-            console.log(sql)
         const response = await this.DBClient.query(sql);
         return response.rows;
     }

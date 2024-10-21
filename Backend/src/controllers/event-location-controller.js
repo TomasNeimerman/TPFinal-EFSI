@@ -1,12 +1,12 @@
 import express from "express";
 import EventLocationService from "./../servicios/event-location-service.js";
-import { authMiddleware } from "../utils/auth-utils.js";
+import AuthMiddleware from "../auth/AuthMiddleware.js"; 
 import Validaciones from "../utils/validaciones-utils.js";
 const eventlocationService = new EventLocationService();
 const router = express.Router();
 const validaciones = new Validaciones();
 
-router.get("/:id", authMiddleware, async (request, response) => {
+router.get("/:id", AuthMiddleware, async (request, response) => {
     try {
       const id = request.params.id;
       if(!await validaciones.existeObjeto(`event_locations`, id)){
@@ -20,7 +20,7 @@ router.get("/:id", authMiddleware, async (request, response) => {
       return response.status(500).json({ message: "Error interno del servidor" });
     }
   });
-router.get("/", authMiddleware, async (request, response) => {
+router.get("/", AuthMiddleware, async (request, response) => {
     try {
       const page = request.query.offset;
       const pageSize = request.query.limit
@@ -31,7 +31,7 @@ router.get("/", authMiddleware, async (request, response) => {
       response.status(500).json({ message: "Error interno del servidor" });
     }
   });
-  router.post("/", authMiddleware, async (request, response) => {
+  router.post("/", AuthMiddleware, async (request, response) => {
     try {
       const id_location = request.body.id_location;
       const name = request.body.name;
@@ -57,7 +57,7 @@ router.get("/", authMiddleware, async (request, response) => {
       response.status(500).json({ message: "Error interno del servidor" });
     }
   });
-  router.post("/", authMiddleware, async (request, response) => {
+  router.post("/", AuthMiddleware, async (request, response) => {
     try {
         const id = request.params.id;
       const id_location = request.body.id_location;

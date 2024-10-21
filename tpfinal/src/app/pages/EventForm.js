@@ -7,7 +7,7 @@ import { AuthContext } from '../../context/AuthContext.js';
 import styles from '../styles/form.module.css';
 
 const EventForm = () => {
-  const { token } = useContext(AuthContext); // Obtener token del contexto
+  const token = localStorage.getItem('token') // Obtener token del contexto
   const [eventName, setEventName] = useState('');
   const [eventDescription, setEventDescription] = useState('');
   const [eventCategory, setEventCategory] = useState(''); // ID de la categoría seleccionada
@@ -22,34 +22,44 @@ const EventForm = () => {
   // Estados para las opciones de categoría y ubicación
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
-
+  console.log("token:", token)
   // Cargar categorías y ubicaciones al montar el componente
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get('http://localhost:3508/api/event-category',{
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setCategories(response.data); // Suponiendo que la respuesta es un array de categorías
-      } catch (error) {
-        console.error('Error al cargar las categorías:', error);
-      }
-    };
-
     const fetchLocations = async () => {
       try {
-        const response = await axios.get('http://localhost:3508/api/event-location');
-        setLocations(response.data); // Suponiendo que la respuesta es un array de ubicaciones
+        const page = 0
+        const limit = 10
+        const response = await axios.get(`http://localhost:3508/api/event-location/?offset=${page}&limit=${limit}`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Asegúrate de que el token esté definido
+          },
+        });
+     
+        
+        setLocations(response.data); // Asignamos las ubicaciones
       } catch (error) {
         console.error('Error al cargar las ubicaciones:', error);
       }
     };
 
+    const fetchCategories = async () => {
+      try {
+        const page = 0
+        const limit = 10
+        const response = await axios.get(`http://localhost:3508/api/event-category/?limit=${limit}&offset=${page}`);
+        console.log(response)
+        setCategories(response.data);
+        
+      } catch (error) {
+        console.error('Error al cargar las categorías:', error);
+      }
+    };
+
     fetchCategories();
     fetchLocations();
-  }, []);
+    console.log(categories)
+  }, [token]); // Añadir dependencias como el token si es necesario
+
 console.log(locations)
   const handleSubmit = async (e) => {
     e.preventDefault();

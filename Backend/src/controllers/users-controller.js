@@ -1,70 +1,74 @@
-import express from "express";
-import UsersService from "./../servicios/users-service.js";
-import Validaciones from "../utils/validaciones-utils.js";
-const usersService = new UsersService();
+import express, { response } from "express";
+import UsuarioServicios from "../servicios/users-service.js";
+import generarToken from "../auth/token.js"; 
+import AuthMiddleware from "../auth/AuthMiddleware.js"; 
+
 const router = express.Router();
-const validaciones = new Validaciones();
-//punto 6
-router.post("/login", async (request, response) => {
-  try {
-    const username = request.body.username;
-    const password = request.body.password;
-    if (!await usersService.validarMail(username)) {
-      response.status(400).json({
-        success: false,
-        message: "El email es invalido.",
-        token: ""
-      });
-    } else {
-      const login = await usersService.recibirToken(username, password); 
-      if (login) {
-        response.status(200).json({
-          success: true,
-          message: "Inicio correcto",
-          token: login[0],       
-          username: login[1]  
+const usuarioServicios = new UsuarioServicios();
+
+router.post("/login", async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const usuario = await usuarioServicios.login(username, password);
+        if(usuario == 400){
+            res.statusCode = usuario 
+            return res.json ("Usuario Invalido")
+        }else if (usuario == 401){
+            res.statusCode = usuario
+            return response.json ("Contraseña Invalida")
+        }else{
+            const token = await generarToken(usuario);
+            return res.json({
+                success: true,
+                message: "",
+                token: token
+            });
+        }
+    } catch (error) {
+        console.error("Error durante el inicio de sesión:", error.message);
+        return res.status(error.status || 500).json({
+            success: false,
+            message: error.message,
+            token: ""
         });
-      } else {
-        response.status(401).json({
-          success: false,
-          message: "Usuario o clave invalida",
-          token: "",
-        });
-      }
     }
-  } catch (error) {
-    console.error("Error al crear algo", error);
-    return response.status(500).json({ message: "Error interno del servidor" });
-  }
 });
 
+router.post("/register", async (req, res) => {
+    const { first_name, last_name, username, password } = req.body;
+    const cheq = await usuarioServicios.cheqUser(first_name, last_name, username, password)
+    if(cheq != true){
+        return res.json(cheq)
+    }
+    try {
+        const resultadoRegistro = await usuarioServicios.register(first_name, last_name, username, password);
+        res.statusCode = 201
+        return res.json({
+            success: true,
+            message: resultadoRegistro.message,
+            userId: resultadoRegistro.userId
+        });
+    } catch (error) {
+        console.error("Error durante el registro de usuario:", error.message);
+        res.statusCode = 500
+        return res.json({
+            success: false,
+            message: error.message
+        });
+    }
+});
 
-router.post("/register", async (request, response) => {
-  try {
-    const { first_name, last_name, username, password } = request.body;
-
-    // Validaciones
-    if (!await usersService.validarMail(username)) {
-      return response.status(400).json({ message: "Username(email) no válido." });
+router.get("/", AuthMiddleware, async (req, res) => {
+    try {
+        const usuario = req.user;
+        return res.json(usuario);
+    } catch (error) {
+        console.error("Error al obtener la información del usuario:", error.message);
+        return res.status(error.status || 500).json({
+            success: false,
+            message: error.message
+        });
     }
-    if (await validaciones.menor3(first_name)) {
-      return response.status(400).json({ message: "Nombre vacío o menor a 3 caracteres" });
-    }
-    if (await validaciones.menor3(last_name)) {
-      return response.status(400).json({ message: "Apellido vacío o menor a 3 caracteres" });
-    }
-    if (await validaciones.menor3(password)) {
-      return response.status(400).json({ message: "Contraseña vacía o menor a 3 caracteres" });
-    }
-
-    // Creación del usuario
-    await usersService.crearUsuario(first_name, last_name, username, password);
-    response.status(201).json({ message: "Usuario creado correctamente" });
-    
-  } catch (error) {
-    console.error("Error al crear usuario", error);
-    response.status(500).json({ message: "Error interno del servidor" });
-  }
 });
 
 export default router;
