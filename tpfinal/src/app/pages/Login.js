@@ -15,7 +15,7 @@ const Login = () => {
     // Verifica si ya hay un token en localStorage
     const token = localStorage.getItem('token');
     if (token) {
-      navigate('/'); // Redirige a la página aprincipal si ya está logueado
+      navigate('/Home'); // Redirige a la lista de eventos si ya está logueado
     }
   }, [navigate]);
 
@@ -30,9 +30,10 @@ const Login = () => {
       });
 
       if (response.data.success) {
+        // Guardar token y nombre de usuario en localStorage
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('username', response.data.username);
-        navigate('/Home'); // Redirige a la página de inicio
+        navigate('/Home'); // Redirige a la lista de eventos
       } else {
         setError(response.data.message);
       }
@@ -44,29 +45,28 @@ const Login = () => {
 
   return (
     <div className={styles.formContainer}>
-    <form onSubmit={handleLogin} className={styles.form}>
-      <label>Nombre de Usuario:</label>
-      <div className={styles.formGroup}>
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-      </div>
-      <label>Contraseña:</label>
-      <div className={styles.formGroup}>
-        
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button type="submit" className={styles.submitButton}>Iniciar Sesión</button>
-    </form>
+      <form onSubmit={handleLogin} className={styles.form}>
+        <label>Nombre de Usuario:</label>
+        <div className={styles.formGroup}>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+        </div>
+        <label>Contraseña:</label>
+        <div className={styles.formGroup}>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <button type="submit" className={styles.submitButton}>Iniciar Sesión</button>
+      </form>
     </div>
   );
 };

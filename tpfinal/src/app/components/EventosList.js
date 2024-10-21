@@ -1,5 +1,5 @@
 // components/EventosList.js
-"use client"; // Esto asegura que este componente se renderiza en el lado del cliente
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -24,10 +24,16 @@ const EventosList = () => {
 
         fetchEventos();
     }, []);
-    console.log(eventos )
+
     if (error) return <div>{error}</div>;
     if (!eventos.length) return <div>No hay eventos disponibles</div>;
-    return <Carousel eventos={eventos} />;
+
+    return (
+        <div>
+            <h2>Lista de Eventos</h2>
+            <Carousel eventos={eventos} />
+        </div>
+    );
 };
 
 export default EventosList;

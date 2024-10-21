@@ -38,17 +38,17 @@ router.get("/", async (request, response) => {
 //punto 4
 router.get("/:id", async (request, response) => {
   try {
-
     const id = request.params.id;
     const detalleEvento = await eventsService.DetalleEvento(id);
-    if (!await validaciones.existeObjeto(`events`, id)) {
+
+    if (!detalleEvento) {
       return response.status(404).json({ message: "No se encontró evento con el ID" });
-    } else {
-      return response.status(200).json(detalleEvento);
     }
+
+    return response.status(200).json(detalleEvento); // Asegúrate de que devuelve un solo objeto
   } catch (error) {
-    console.error(error);
-    return response.status(500).json({ message: "Hubo un error al procesar la solicitud" });
+    console.error('Error al cargar los detalles del evento:', error);
+    return response.status(500).json({ message: "Error al procesar la solicitud" });
   }
 });
 
@@ -60,8 +60,8 @@ router.get("/:id/enrollment", async(request, respose) => {
   const username = request.query.username
   const attended = request.query.attended
   const rating = request.query.rating
-  const pageSize = request.query.limit
-  const page = request.query.offset
+  const pageSize = 10
+  const page = 0
       try{
           const usuario = await eventsService.listaUsuarios(id, first_name, last_name, username, attended, rating, pageSize, page)
           if(usuario){
@@ -185,6 +185,19 @@ router.delete("/:id/enrollment", authMiddleware, async (request, response) => {
   } catch (error) {
     console.error("Error al crear el evento:", error);
     response.status(500).json({ message: "Error interno del servidor" });
+  }
+});
+
+router.get("/:id/enrollment", authMiddleware, async (req, res) => {
+  const id_event = req.params.id;
+  const id_user = req.user.id;
+
+  try {
+    const isEnrolled = await eventsService.isUserEnrolled(id_event, id_user);
+    res.status(200).json({ isEnrolled });
+  } catch (error) {
+    console.error("Error al verificar inscripción:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
   }
 });
 

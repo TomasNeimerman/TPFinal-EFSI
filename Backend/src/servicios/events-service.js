@@ -61,6 +61,10 @@ export default class EventsService{
         const returnArray = await repo.unregisterUser(id_event, id_user);
         return returnArray;
     }
+    isUserEnrolled = async (id_event, id_user) => {
+        const repo = new EventRepository();
+        return await repo.isUserEnrolled(id_event, id_user);
+      };
     ratingEvento = async(id_event, rating) =>{
         const repo = new EventRepository();
         const returnArray = await repo.ratingEvento(id_event, rating);

@@ -17,17 +17,23 @@ const Header = () => {
 
   return (
     <header className={styles.body}>
-      <div className={styles.logo}>
-        <Link to="/Home">
-          <Image src={logo} alt="Logo" />
-        </Link>
+      <div className={styles.leftSection}>
+        <div className={styles.logo}>
+          <Link to="/Home">
+            <Image src={logo} alt="Logo" />
+          </Link>
+        </div>
+
+        {/* Mostrar "Crear Evento" solo si el token no es nulo */}
+        {token && (
+          <div className={styles.createEventLink}>
+            <Link to="/event-form">Crear Evento</Link>
+          </div>
+        )}
       </div>
 
       <nav>
         <ul className={styles.navLinks}>
-          {/* Mostrar "Crear Evento" solo si el token no es nulo */}
-          {token && <li><Link to="/event-form">Crear Evento</Link></li>}
-          
           {!token ? (
             <>
               <li><Link to="/">Login</Link></li>
