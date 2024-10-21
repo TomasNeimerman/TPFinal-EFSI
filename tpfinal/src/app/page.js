@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import EventDetail from './components/EventDetail';
 import EventForm from './pages/EventForm';
 import { AuthProvider } from '../context/AuthContext.js'; // Importa el AuthProvider
 
@@ -17,7 +18,8 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/Home" element={<Home />} />
           <Route path="/Register" element={<Register />} />
-          <Route path="/create-event" element={<EventForm />} /> {/* Formulario de eventos */}
+          <Route path="/event/:id" element={<EventDetail />} />
+          <Route path="/event-form" element={<EventForm />} /> {/* Formulario de eventos */}
         </Routes>
         <Footer />
       </Router>

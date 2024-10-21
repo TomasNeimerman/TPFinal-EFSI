@@ -1,4 +1,3 @@
-// src/components/Header.js
 import { Link } from 'react-router-dom';
 import Image from 'next/image';
 import logo from '../img/logo.png';
@@ -26,7 +25,9 @@ const Header = () => {
 
       <nav>
         <ul className={styles.navLinks}>
-          <li><Link to="/Home">Home</Link></li>
+          {/* Mostrar "Crear Evento" solo si el token no es nulo */}
+          {token && <li><Link to="/event-form">Crear Evento</Link></li>}
+          
           {!token ? (
             <>
               <li><Link to="/">Login</Link></li>

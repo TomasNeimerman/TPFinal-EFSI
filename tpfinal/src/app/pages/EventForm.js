@@ -1,16 +1,51 @@
 // src/app/pages/EventForm.js
 "use client"; // Asegura que este componente se ejecute en el cliente
 
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext.js';
 import styles from '../styles/form.module.css';
 
 const EventForm = () => {
-  const { token } = useContext(AuthContext);
+  const { token } = useContext(AuthContext); // Obtener token del contexto
   const [eventName, setEventName] = useState('');
   const [eventDescription, setEventDescription] = useState('');
+  const [eventCategory, setEventCategory] = useState(''); // ID de la categoría seleccionada
+  const [eventLocation, setEventLocation] = useState(''); // ID de la ubicación seleccionada
+  const [startDate, setStartDate] = useState(''); // Nuevo campo para fecha de inicio
+  const [duration, setDuration] = useState(''); // Nuevo campo para duración
+  const [price, setPrice] = useState(''); // Nuevo campo para precio
+  const [maxAssistance, setMaxAssistance] = useState(''); // Nuevo campo para asistencia máxima
+  const [enabledForEnrollment, setEnabledForEnrollment] = useState(false); // Nuevo campo para habilitar inscripciones
   const [error, setError] = useState('');
+  
+  // Estados para las opciones de categoría y ubicación
+  const [categories, setCategories] = useState([]);
+  const [locations, setLocations] = useState([]);
+
+  // Cargar categorías y ubicaciones al montar el componente
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('http://localhost:3508/api/event-category');
+        setCategories(response.data); // Suponiendo que la respuesta es un array de categorías
+      } catch (error) {
+        console.error('Error al cargar las categorías:', error);
+      }
+    };
+
+    const fetchLocations = async () => {
+      try {
+        const response = await axios.get('http://localhost:3508/api/event-location');
+        setLocations(response.data); // Suponiendo que la respuesta es un array de ubicaciones
+      } catch (error) {
+        console.error('Error al cargar las ubicaciones:', error);
+      }
+    };
+
+    fetchCategories();
+    fetchLocations();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,6 +56,13 @@ const EventForm = () => {
         {
           name: eventName,
           description: eventDescription,
+          id_event_category: eventCategory,
+          id_event_location: eventLocation,
+          start_date: startDate,
+          duration_in_minutes: duration,
+          price: price,
+          enabled_for_enrollment: enabledForEnrollment,
+          max_assistance: maxAssistance,
         },
         {
           headers: {
@@ -31,6 +73,16 @@ const EventForm = () => {
 
       if (response.data.success) {
         console.log('Evento creado con éxito');
+        // Resetear el formulario si es necesario
+        setEventName('');
+        setEventDescription('');
+        setEventCategory('');
+        setEventLocation('');
+        setStartDate('');
+        setDuration('');
+        setPrice('');
+        setMaxAssistance('');
+        setEnabledForEnrollment(false);
       } else {
         setError(response.data.message);
       }
@@ -52,6 +104,7 @@ const EventForm = () => {
             required
           />
         </div>
+        
         <label>Descripción del Evento:</label>
         <div className={styles.formGroup}>
           <textarea
@@ -60,6 +113,88 @@ const EventForm = () => {
             required
           />
         </div>
+
+        <label>Categoría del Evento:</label>
+        <div className={styles.formGroup}>
+          <select
+            value={eventCategory}
+            onChange={(e) => setEventCategory(e.target.value)}
+            required
+          >
+            <option value="">Selecciona una categoría</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <label>Ubicación del Evento:</label>
+        <div className={styles.formGroup}>
+          <select
+            value={eventLocation}
+            onChange={(e) => setEventLocation(e.target.value)}
+            required
+          >
+            <option value="">Selecciona una ubicación</option>
+            {locations.map((location) => (
+              <option key={location.id} value={location.id}>
+                {location.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <label>Fecha de Inicio:</label>
+        <div className={styles.formGroup}>
+          <input
+            type="datetime-local"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            required
+          />
+        </div>
+
+        <label>Duración (en minutos):</label>
+        <div className={styles.formGroup}>
+          <input
+            type="number"
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+            required
+          />
+        </div>
+
+        <label>Precio:</label>
+        <div className={styles.formGroup}>
+          <input
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            required
+          />
+        </div>
+
+        <label>Máxima Asistencia:</label>
+        <div className={styles.formGroup}>
+          <input
+            type="number"
+            value={maxAssistance}
+            onChange={(e) => setMaxAssistance(e.target.value)}
+            required
+          />
+        </div>
+
+        <label>
+          <input
+            type="checkbox"
+            checked={enabledForEnrollment}
+            onChange={(e) => setEnabledForEnrollment(e.target.checked)}
+          />
+          Habilitar Inscripción
+        </label>
+
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <button type="submit" className={styles.submitButton}>
           Crear Evento
