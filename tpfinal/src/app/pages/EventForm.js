@@ -22,45 +22,50 @@ const EventForm = () => {
   // Estados para las opciones de categoría y ubicación
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
-  console.log("token:", token)
+
   // Cargar categorías y ubicaciones al montar el componente
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const page = 0
-        const limit = 10
+        const page = 0;
+        const limit = 15;
         const response = await axios.get(`http://localhost:3508/api/event-location/?offset=${page}&limit=${limit}`, {
           headers: {
             Authorization: `Bearer ${token}`, // Asegúrate de que el token esté definido
           },
         });
-     
-        
+  
+        console.log('Respuesta de la API:', response.data);
+  
         setLocations(response.data); // Asignamos las ubicaciones
       } catch (error) {
         console.error('Error al cargar las ubicaciones:', error);
       }
     };
-
-    const fetchCategories = async () => {
-      try {
-        const page = 0
-        const limit = 10
-        const response = await axios.get(`http://localhost:3508/api/event-category/?limit=${limit}&offset=${page}`);
-        console.log(response)
-        setCategories(response.data);
-        
-      } catch (error) {
-        console.error('Error al cargar las categorías:', error);
-      }
-    };
-
-    fetchCategories();
+  
     fetchLocations();
-    console.log(categories)
-  }, [token]); // Añadir dependencias como el token si es necesario
+  }, [token]);
+useEffect(() =>{
+  const fetchCategories = async () => {
+  try {
+    const page = 0
+    const limit = 15
+    const response = await axios.get(`http://localhost:3508/api/event-category/?limit=${limit}&offset=${page}`);
 
-console.log(locations)
+    setCategories(response.data);
+    
+  } catch (error) {
+    console.error('Error al cargar las categorías:', error);
+  }
+};
+
+fetchCategories();
+
+
+}, );
+     // Añadir dependencias como el token si es necesario
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -105,8 +110,8 @@ console.log(locations)
       setError('Error al crear el evento.');
     }
   };
-console.log(categories)
-console.log(locations)
+  console.log(locations)
+  console.log(categories)
   return (
     <div className={styles.formContainer}>
       <form onSubmit={handleSubmit} className={styles.form}>
@@ -153,7 +158,7 @@ console.log(locations)
             required
           >
             <option value="">Selecciona una ubicación</option>
-            {locations.map((location) => (
+            {Array.isArray(locations) && locations.map((location) => (
               <option key={location.id} value={location.id}>
                 {location.name}
               </option>

@@ -90,104 +90,64 @@ export default class EventRepository{
     
     
     //Punto 4
-    async DetalleEvento(id){
-        console.log(id)
-          const sql = `SELECT E.id, E.name, E.description, E.start_date, E.duration_in_minutes, E.price, E.enabled_for_enrollment, E.max_assistance,
-          E.id_creator_user AS id_creator_user, 
-          json_build_object(
-              'id', EL.id,
-              'id_location', EL.id_location,
-              'name', EL.name,
-              'full_address', EL.full_address,
-              'latitude', EL.latitude,
-              'longitude', EL.longitude,
-              'max_capacity', EL.max_capacity,
-              'id_creator_user', EL.id_creator_user
-          ) AS event_location,
-          json_build_object(
-              'id', L.id,
-              'name', L.name,
-              'id_province', L.id_province,
-              'latitude', L.latitude,
-              'longitude', L.longitude
-          ) AS location,
-          json_build_object(
-              'id', P.id,
-              'name', P.name,
-              'full_name', P.full_name,
-              'latitude', P.latitude,
-              'longitude', P.longitude,
-              'display_order', P.display_order
-          ) AS province,
-          json_build_object(
-            'id', U.id,
-            'first_name', U.first_name,
-            'last_name', U.last_name,
-            'username', U.username,
-            'password', U.password
-          ) AS creator_user,
-          array(
-            SELECT json_build_object(
-                'id', tags.id,
-                'name', tags.name
-            )
-            FROM tags  
-          ) AS tags,
-          json_build_object(
-            'id', EC.id,
-            'name', EC.name,
-            'display_order', EC.display_order
-          ) AS event_category
-      FROM events E 
-      JOIN users U ON E.id_creator_user = U.id 
-      JOIN event_categories EC ON E.id_event_category = EC.id 
-      JOIN event_locations EL ON E.id_event_location = EL.id 
-      JOIN locations L ON EL.id_location = L.id 
-      JOIN provinces P ON L.id_province = P.id 
-      WHERE E.id = '${id}'`;
-        console.log(sql)
-          const response = await this.DBClient.query(sql); 
-          return response.rows;
+    async DetalleEvento(id) {
+        const sql = `
+          SELECT E.id, E.name, E.description, E.start_date, 
+                 E.duration_in_minutes, E.price, E.enabled_for_enrollment,
+                 E.max_assistance, 
+                 EL.max_capacity, 
+                 (SELECT COUNT(*) FROM event_enrollments EE WHERE EE.id_event = E.id) AS current_enrolled
+          FROM events E
+          JOIN event_locations EL ON E.id_event_location = EL.id
+          WHERE E.id = '${id}'
+        `;      
+        const response = await this.DBClient.query(sql);
+        return response.rows[0];
     }
+    
     //Punto 5
-    async listaUsuarios(id, first, last, username, attended, rating, pageSize, page){
-        let queryAgregado=``
-        if(first != null){
-            queryAgregado += `AND U.first_name = '${first}'`
+    async listaUsuarios(id, first, last, username, attended, rating, pageSize, page) {
+        let queryAgregado = '';
+    
+        if (first) {
+            queryAgregado += `AND U.first_name = '${first}' `;
         }
-        if(last != null){
-            queryAgregado += `AND U.last_name = '${last}'`
+        if (last) {
+            queryAgregado += `AND U.last_name = '${last}' `;
         }
-        if(username != null){
-            queryAgregado += `AND U.username = '${username}'`
+        if (username) {
+            queryAgregado += `AND U.username = '${username}' `;
         }
-        if(attended != null){
-            queryAgregado += `AND ER.attended = '${attended}'`
+        if (attended) {
+            queryAgregado += `AND ER.attended = '${attended}' `;
         }
-        if(rating != null){
-            queryAgregado += `AND ER.rating = '${rating}'`
+        if (rating) {
+            queryAgregado += `AND ER.rating = '${rating}' `;
         }
-
-        
-        const sql = `SELECT ER.id, ER.id_event, ER.id_user, 
-        json_build_object(
-            'id', U.id,
-            'first_name', U.first_name,
-            'last_name', U.last_name,
-            'username', U.username,
-            'password', U.password
-        ) AS user,
-        ER.description, ER.attended, ER.rating
-        FROM users U 
-        JOIN event_enrollments ER on ER.id_user = U.id 
-        JOIN events E on E.id = ER.id_event
-        WHERE E.id = '${id}' ` 
-        + queryAgregado +
-        ` LIMIT ${pageSize} OFFSET ${page}`
+    
+        const sql = `
+            SELECT ER.id, ER.id_event, ER.id_user,
+            json_build_object(
+                'id', U.id,
+                'first_name', U.first_name,
+                'last_name', U.last_name,
+                'username', U.username
+            ) AS user,
+            ER.description, ER.attended, ER.rating
+            FROM users U 
+            JOIN event_enrollments ER ON ER.id_user = U.id 
+            JOIN events E ON E.id = ER.id_event
+            WHERE E.id = '${id}' 
+            ${queryAgregado}
+            LIMIT '${pageSize}' OFFSET '${page}';
+        `;
+    
         console.log(sql);
-        const response = await this.DBClient.query(sql); 
+        const response = await this.DBClient.query(sql);
         return response.rows;
     }
+    
+    
    
 
     //punto 8
@@ -222,14 +182,33 @@ export default class EventRepository{
 }
 
 //punto 9
-async registerUser(id_event, id_user, description, attended, observations, rating, registration_date_time){
-    const sql = `INSERT INTO event_enrollments (id_event, id_user, description, registration_date_time, attended, observations, rating)
-    VALUES ('${id_event}', '${id_user}', '${description}', '${registration_date_time}', '${attended}', '${observations}', '${rating}')
-    RETURNING *`
-    console.log(sql)
-    const response = await this.DBClient.query(sql);
-    return response.rows
+async registerUser(id_event, id_user, description, attended = false, observations, rating, registration_date_time) {
+    const sqlCheckEnrollment = `
+        SELECT * FROM event_enrollments 
+        WHERE id_event = '${id_event}' AND id_user = '${id_user}'
+    `;
+    const existingEnrollment = await this.DBClient.query(sqlCheckEnrollment);
+    if (existingEnrollment.rows.length > 0) {
+        throw new Error("Ya estás inscrito en este evento.");
+    }
+
+    // Validar que el valor attended sea booleano
+    if (typeof attended !== 'boolean') {
+        throw new Error("El valor de 'attended' debe ser true o false.");
+    }
+
+    const sql = `
+        INSERT INTO event_enrollments (id_event, id_user, description, registration_date_time, attended, observations, rating)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING *
+    `;
+    const values = [id_event, id_user, description, registration_date_time, attended, observations, rating];
+    const response = await this.DBClient.query(sql, values);
+    return response.rows;
 }
+
+
+
 async unregisterUser(id_event, id_user){
 
         const sql = `
@@ -239,6 +218,13 @@ async unregisterUser(id_event, id_user){
         const response = await this.DBClient.query(sql);
         return response.rows
 }
+async isUserEnrolled(id_event, id_user) {
+    const sql = `
+      SELECT * FROM event_enrollments 
+      WHERE id_event = '${id_event}' AND id_user = '${id_user}'`;
+    const response = await this.DBClient.query(sql);
+    return response.rows.length > 0;
+  }
 
 //Punto 10
 async ratingEvento(id_event, rating){

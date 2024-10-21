@@ -1,79 +1,103 @@
-"use client"; // Asegura que este componente se ejecute en el cliente
-
-import React, { useState, useEffect, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../context/AuthContext.js'; 
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const EventDetail = () => {
-    const { id } = useParams();  // Obtener el ID del evento desde la URL
-    const [evento, setEvento] = useState(null); // Guardar los detalles del evento
-    const { token } = useContext(AuthContext);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
+  const { id } = useParams();
+  const [evento, setEvento] = useState(null);
+  const [error, setError] = useState(null);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [capacity, setCapacity] = useState(0);
+  const [currentEnrolled, setCurrentEnrolled] = useState(0);
 
-    // Cargar detalles del evento al montar el componente
-    useEffect(() => {
-        const fetchEventDetail = async () => {
-            try {
-                const response = await axios.get(`http://localhost:3508/api/event/${id}`);
-                setEvento(response.data); // Guardar los datos del evento en el estado
-            } catch (error) {
-                console.error('Error al cargar detalles del evento:', error);
-                setError('Error al cargar los detalles del evento');
-            }
-        };
-
-        fetchEventDetail();
-    }, [id]);
-
-    // Función para manejar la inscripción
-    const handleInscription = async () => {
-        console.log('Token:', token); // Verifica el token
-        try {
-            const response = await axios.post(
-                `http://localhost:3508/api/event/${id}/enrollment`,
-                {
-                    description: '',
-                    attended: false,
-                    observations: '',
-                    rating: null,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            console.log('Inscripción exitosa:', response.data);
-        } catch (error) {
-            console.error('Error al inscribirse al evento:', error.response ? error.response.data : error.message);
-            setError('Error al inscribirse al evento');
+  useEffect(() => {
+    const fetchEvento = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setError('No estás autenticado. Por favor, inicia sesión.');
+          return;
         }
+  
+        // Obtener los detalles del evento
+        const eventResponse = await axios.get(`http://localhost:3508/api/event/${id}`);
+        if (!eventResponse.data) {
+          throw new Error('No se encontraron los detalles del evento.');
+        }
+  
+        // Asegúrate de que los valores sean numéricos
+        setEvento(eventResponse.data);
+        setCapacity(parseInt(eventResponse.data.max_capacity) || 0);  // Capacidad máxima
+        setCurrentEnrolled(parseInt(eventResponse.data.current_enrolled) || 0);  // Inscriptos actuales
+  
+        const enrollmentResponse = await axios.get(`http://localhost:3508/api/event/${id}/enrollment`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setIsEnrolled(enrollmentResponse.data.isEnrolled);
+      } catch (error) {
+        setError(error.response?.data?.message || 'Error al cargar los detalles del evento.');
+      }
     };
-    console.log(token)
+  
+    fetchEvento();
+  }, [id]);
 
-    // Mostrar error si hubo un problema al cargar el evento
-    if (error) return <div>{error}</div>;
+  const handleEnroll = async () => {
+    try {
+      if (currentEnrolled >= capacity) {
+        alert("El evento ha alcanzado el límite de plazas.");
+        return;
+      }
 
-    // Mostrar mensaje de carga mientras los detalles no se han obtenido
-    if (!evento) return <div>Cargando detalles del evento...</div>;
+      const token = localStorage.getItem('token');
+      await axios.post(`http://localhost:3508/api/event/${id}/enrollment`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setIsEnrolled(true);
+      setCurrentEnrolled(currentEnrolled + 1);
+    } catch (error) {
+      alert("Hubo un error al intentar inscribirse.");
+      console.error("Error al inscribirse al evento:", error);
+    }
+  };
 
-    // Renderizar los detalles del evento
-    return (
-        <div>
-            <h1>Detalles del Evento</h1>
-            <p><strong>Nombre del Evento:</strong> {evento[id-1].name}</p>
-            <p><strong>Descripción:</strong> {evento[id-1].description}</p>
-            <p><strong>Duración (minutos):</strong> {evento[id-1].duration_in_minutes}</p>
-            <p><strong>Asistencia Máxima:</strong> {evento[id-1].max_assistance}</p>
-            <p><strong>Precio:</strong> ${evento[id-1].price}</p>
-            <p><strong>Fecha de Inicio:</strong> {new Date(evento[id-1].start_date).toLocaleDateString()}</p>
-            <p><strong>Inscripciones Habilitadas:</strong> {evento[id-1].enabled_for_enrollment ? 
-                <button onClick={handleInscription}>Inscribirse</button> : 'No disponibles'}
-            </p>
-        </div>
-    );
+  const handleUnenroll = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:3508/api/event/${id}/enrollment`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setIsEnrolled(false);
+      setCurrentEnrolled(currentEnrolled - 1);
+    } catch (error) {
+      alert("Hubo un error al intentar desinscribirse.");
+      console.error("Error al desinscribirse del evento:", error);
+    }
+  };
+
+  if (error) return <div>{error}</div>;
+  if (!evento) return <div>Cargando detalles del evento...</div>;
+
+  return (
+    <div>
+      <h1>Detalles del Evento</h1>
+      <p><strong>Nombre del Evento:</strong> {evento.name}</p>
+      <p><strong>Descripción:</strong> {evento.description}</p>
+      <p><strong>Duración (minutos):</strong> {evento.duration_in_minutes}</p>
+      <p><strong>Capacidad Máxima:</strong> {capacity}</p>
+      <p><strong>Inscriptos Actuales:</strong> {currentEnrolled}</p>
+
+      {isEnrolled ? (
+        <button onClick={handleUnenroll} style={{ backgroundColor: 'red', color: 'white' }}>
+          Desinscribirse del Evento
+        </button>
+      ) : (
+        <button onClick={handleEnroll} style={{ backgroundColor: 'blue', color: 'white' }}>
+          Inscribirse al Evento
+        </button>
+      )}
+    </div>
+  );
 };
 
 export default EventDetail;

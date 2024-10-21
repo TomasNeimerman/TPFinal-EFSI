@@ -2,7 +2,7 @@ import EventLocationRepository from './../../src/repositories/event-loaction-rep
 export default class EventLocationService{
     getAllEventlocations = async (page, pageSize) =>{
         const repo = new EventLocationRepository();
-        const returnArray = await repo.getAllEventlocations(page, pageSize);
+        const returnArray = await repo.getAllEventLocations(page, pageSize);
         return{
             collection: returnArray,
             pageSize: pageSize,

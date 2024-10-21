@@ -10,8 +10,8 @@ const validaciones = new Validaciones();
 // punto 2 y 3
 // events-controller.js
 router.get("/", async (request, response) => {
-  const pageSize = request.query.limit || 10;
-  const page = request.query.offset || 0; 
+  const pageSize = 10;
+  const page = 0; 
   const name = request.query.name || null; 
   const category = request.query.category || null; 
   const startDate = request.query.startDate || null; 
@@ -60,8 +60,8 @@ router.get("/:id/enrollment", async(request, respose) => {
   const username = request.query.username
   const attended = request.query.attended
   const rating = request.query.rating
-  const pageSize = request.query.limit
-  const page = request.query.offset
+  const pageSize = 10
+  const page = 0
       try{
           const usuario = await eventsService.listaUsuarios(id, first_name, last_name, username, attended, rating, pageSize, page)
           if(usuario){
