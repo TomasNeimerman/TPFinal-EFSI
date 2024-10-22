@@ -23,7 +23,7 @@ export default class Bd {
         const num = await this.cantUsuarios()
         let id = parseInt(num[0].count)
         const sql = `INSERT INTO users (id, first_name, last_name, username, password)
-            VALUES ('${id++}', '${first_name}', '${last_name}', '${username}', '${password}')
+            VALUES ('${id+1}', '${first_name}', '${last_name}', '${username}', '${password}')
             RETURNING id`;
             console.log(sql)
         try {

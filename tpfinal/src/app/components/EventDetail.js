@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import styles from '../styles/detail.module.css'
 
 const EventDetail = () => {
   const { id } = useParams();
@@ -80,23 +81,32 @@ const EventDetail = () => {
 
   return (
     <div>
-      <h1>Detalles del Evento</h1>
-      <p><strong>Nombre del Evento:</strong> {evento.name}</p>
-      <p><strong>Descripción:</strong> {evento.description}</p>
-      <p><strong>Duración (minutos):</strong> {evento.duration_in_minutes}</p>
-      <p><strong>Capacidad Máxima:</strong> {capacity}</p>
-      <p><strong>Inscriptos Actuales:</strong> {currentEnrolled}</p>
-
-      {isEnrolled ? (
-        <button onClick={handleUnenroll} style={{ backgroundColor: 'red', color: 'white' }}>
-          Desinscribirse del Evento
-        </button>
-      ) : (
-        <button onClick={handleEnroll} style={{ backgroundColor: 'blue', color: 'white' }}>
-          Inscribirse al Evento
-        </button>
-      )}
+    <div className={styles.header}>
+      <h1>Detalle del evento</h1>
     </div>
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <h2 className={styles.title}>{evento.name}</h2>
+          <p><strong>Descripción:</strong> {evento.description}</p>
+          <p><strong>Duración:</strong> {evento.duration_in_minutes} minutos</p>
+          <p><strong>Capacidad:</strong> {capacity}</p>
+          <p><strong>Localidad:</strong> {evento.location}</p>
+          <p><strong>Categoría:</strong> {evento.category}</p>
+          <p><strong>Inscriptos:</strong> {currentEnrolled}</p>
+  
+          {isEnrolled ? (
+            <button onClick={handleUnenroll} className={ styles.unenrollbutton}>
+              Desinscribirse
+            </button>
+          ) : (
+            <button onClick={handleEnroll} className={styles.enrollbutton}>
+              Inscribirse
+            </button>
+          )}
+        </div>
+      </div>
+      </div>
+  
   );
 };
 
