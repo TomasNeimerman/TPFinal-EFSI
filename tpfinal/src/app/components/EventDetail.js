@@ -22,6 +22,7 @@ const EventDetail = () => {
   
         // Obtener los detalles del evento
         const eventResponse = await axios.get(`http://localhost:3508/api/event/${id}`);
+        
         if (!eventResponse.data) {
           throw new Error('No se encontraron los detalles del evento.');
         }
@@ -75,7 +76,7 @@ const EventDetail = () => {
       console.error("Error al desinscribirse del evento:", error);
     }
   };
-
+  console.log(evento)
   if (error) return <div>{error}</div>;
   if (!evento) return <div>Cargando detalles del evento...</div>;
 
@@ -90,8 +91,6 @@ const EventDetail = () => {
           <p><strong>Descripción:</strong> {evento.description}</p>
           <p><strong>Duración:</strong> {evento.duration_in_minutes} minutos</p>
           <p><strong>Capacidad:</strong> {capacity}</p>
-          <p><strong>Localidad:</strong> {evento.location}</p>
-          <p><strong>Categoría:</strong> {evento.category}</p>
           <p><strong>Inscriptos:</strong> {currentEnrolled}</p>
   
           {isEnrolled ? (

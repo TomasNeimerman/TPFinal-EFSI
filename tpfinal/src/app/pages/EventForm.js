@@ -2,6 +2,7 @@
 "use client"; // Asegura que este componente se ejecute en el cliente
 
 import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext.js';
 import styles from '../styles/form.module.css';
@@ -18,7 +19,7 @@ const EventForm = () => {
   const [maxAssistance, setMaxAssistance] = useState(''); // Nuevo campo para asistencia máxima
   const [enabledForEnrollment, setEnabledForEnrollment] = useState(false); // Nuevo campo para habilitar inscripciones
   const [error, setError] = useState('');
-  
+  const navigate = useNavigate();
   // Estados para las opciones de categoría y ubicación
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
@@ -34,9 +35,7 @@ const EventForm = () => {
             Authorization: `Bearer ${token}`, // Asegúrate de que el token esté definido
           },
         });
-  
         console.log('Respuesta de la API:', response.data);
-  
         setLocations(response.data); // Asignamos las ubicaciones
       } catch (error) {
         console.error('Error al cargar las ubicaciones:', error);
@@ -45,24 +44,20 @@ const EventForm = () => {
   
     fetchLocations();
   }, [token]);
-useEffect(() =>{
+  useEffect(() =>{
   const fetchCategories = async () => {
-  try {
-    const page = 0
-    const limit = 15
-    const response = await axios.get(`http://localhost:3508/api/event-category/?limit=${limit}&offset=${page}`);
-
-    setCategories(response.data);
-    
-  } catch (error) {
-    console.error('Error al cargar las categorías:', error);
-  }
+    try {
+      const page = 0
+      const limit = 15
+      const response = await axios.get(`http://localhost:3508/api/event-category/?limit=${limit}&offset=${page}`);
+      setCategories(response.data);
+    }catch (error) {
+      console.error('Error al cargar las categorías:', error);
+    }
 };
 
 fetchCategories();
-
-
-}, );
+}, []);
      // Añadir dependencias como el token si es necesario
 
 
@@ -105,9 +100,12 @@ fetchCategories();
       } else {
         setError(response.data.message);
       }
+      
     } catch (error) {
       console.error('Error al crear el evento:', error);
       setError('Error al crear el evento.');
+    } finally{
+      navigate('/Home')
     }
   };
   console.log(locations)

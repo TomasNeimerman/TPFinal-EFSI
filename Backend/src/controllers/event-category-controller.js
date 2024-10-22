@@ -25,7 +25,7 @@ router.post("/", async (request, response) => {
       const pageSize = request.query.limit;
       const page = request.query.offset;
       const categorias = await eventcategoryService.getAllCategories(pageSize, page);
-      console.log(categorias.collection);
+     
       return response.status(200).json(categorias.collection); 
     } catch (error) {
       console.error("Error al obtener todas las categorías:", error);
@@ -40,7 +40,7 @@ router.post("/", async (request, response) => {
             return response.status(404).json({message: "Categoria del ID no encontrada"})
           }else{
           const categoria = await eventcategoryService.getCategoryById(id);
-          return response.status(200).json(categoria);
+          return response.status(200).json(categoria.collection);
           }
       } catch (error) {
         console.error("Error al obtener la categoria por ID:", error);

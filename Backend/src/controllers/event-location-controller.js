@@ -13,7 +13,7 @@ router.get("/:id", AuthMiddleware, async (request, response) => {
         return response.status(404).json({message: "Event location del ID no encontrada"})
       }else{
         const eventLocations = await eventlocationService.getEventLocationById(id);
-      return response.status(200).json(eventLocations);
+      return response.status(200).json(eventLocations.collection);
       }
     } catch (error) {
       console.error("Error al obtener las localidades del evento por ID:", error);
@@ -25,7 +25,8 @@ router.get("/", AuthMiddleware, async (request, response) => {
       const page = request.query.offset;
       const pageSize = request.query.limit
       const eventLocations = await eventlocationService.getAllEventlocations(page, pageSize);
-      return response.status(200).json(eventLocations);
+     
+      return response.status(200).json(eventLocations.collection);
     } catch (error) {
       console.error("Error al obtener todas las localidades del evento:", error);
       response.status(500).json({ message: "Error interno del servidor" });

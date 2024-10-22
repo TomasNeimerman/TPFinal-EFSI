@@ -96,9 +96,13 @@ export default class EventRepository{
                  E.duration_in_minutes, E.price, E.enabled_for_enrollment,
                  E.max_assistance, 
                  EL.max_capacity, 
+                 EL.name,
+                 EL.full_adress,
+                 EC.name,
                  (SELECT COUNT(*) FROM event_enrollments EE WHERE EE.id_event = E.id) AS current_enrolled
           FROM events E
           JOIN event_locations EL ON E.id_event_location = EL.id
+          JOIN event_categories EC ON E.id_event_category = EC.id
           WHERE E.id = '${id}'
         `;      
         const response = await this.DBClient.query(sql);
