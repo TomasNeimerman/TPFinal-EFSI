@@ -30,7 +30,6 @@ const EventosList = () => {
 
     return (
         <div>
-            <h2>Lista de Eventos</h2>
             <Carousel eventos={eventos} />
         </div>
     );

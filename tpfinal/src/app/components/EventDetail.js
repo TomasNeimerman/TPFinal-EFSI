@@ -90,6 +90,8 @@ const EventDetail = () => {
           <h2 className={styles.title}>{evento.name}</h2>
           <p><strong>Descripción:</strong> {evento.description}</p>
           <p><strong>Duración:</strong> {evento.duration_in_minutes} minutos</p>
+          <p><strong>Ubicación: </strong>{evento.full_address}</p>
+          <p><strong>Categoria: </strong>{evento.name}</p>
           <p><strong>Capacidad:</strong> {capacity}</p>
           <p><strong>Inscriptos:</strong> {currentEnrolled}</p>
   

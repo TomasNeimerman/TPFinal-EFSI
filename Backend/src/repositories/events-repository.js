@@ -97,7 +97,7 @@ export default class EventRepository{
                  E.max_assistance, 
                  EL.max_capacity, 
                  EL.name,
-                 EL.full_adress,
+                 EL.full_address,
                  EC.name,
                  (SELECT COUNT(*) FROM event_enrollments EE WHERE EE.id_event = E.id) AS current_enrolled
           FROM events E
