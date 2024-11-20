@@ -71,4 +71,19 @@ router.get("/", AuthMiddleware, async (req, res) => {
     }
 });
 
+router.patch("/isAdmin", AuthMiddleware, async (req, res)=>{
+    try{
+        const userId = req.user.id;
+        await usuarioServicios.darAdmin(userId)
+        return res.status(200).json({message: "El usuario ahora es admin"})
+    }
+ catch (error) {
+    console.error("Error al obtener la información del usuario:", error.message);
+    return res.status(500).json({
+        success: false,
+        message: error.message
+    });
+}
+})
+
 export default router;

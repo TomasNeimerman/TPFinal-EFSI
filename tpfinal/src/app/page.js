@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import EventDetail from './components/EventDetail';
 import EventForm from './pages/EventForm';
+import EditorAdmin from './pages/EditorAdmin'
 import { AuthProvider } from '../context/AuthContext.js'; // Importa el AuthProvider
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path="/Register" element={<Register />} />
           <Route path="/event/:id" element={<EventDetail />} />
           <Route path="/event-form" element={<EventForm />} /> {/* Formulario de eventos */}
+          <Route path="/Admin" element={<EditorAdmin/>} />
         </Routes>
         <Footer />
       </Router>

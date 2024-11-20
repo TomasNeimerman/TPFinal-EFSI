@@ -58,7 +58,7 @@ router.get("/", AuthMiddleware, async (request, response) => {
       response.status(500).json({ message: "Error interno del servidor" });
     }
   });
-  router.post("/", AuthMiddleware, async (request, response) => {
+  router.put("/", AuthMiddleware, async (request, response) => {
     try {
         const id = request.params.id;
       const id_location = request.body.id_location;

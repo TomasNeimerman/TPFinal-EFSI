@@ -47,4 +47,10 @@ export default class UsuarioServicios {
             throw new Error('Error interno del servidor');
         }
     }
+    isAdmin = async (id) =>{
+        const repo = bd
+        const returnArray = await repo.isAdmin(id);
+        return returnArray;
+    }
+
 }

@@ -56,4 +56,10 @@ export default class Bd {
             return("Error contando usuarios")
         }
     }
+
+    async isAdmin(id){
+        const sql = `UPDATE users SET admin = true WHERE id='${id}' RETURNING *`
+        const response = await this.DBClient.query(sql);
+        return response.rows
+    }
 }
