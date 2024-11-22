@@ -1,14 +1,12 @@
-// src/pages/EditorAdmin.js
 "use client";
 
-import React, { useEffect, useState, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { AuthContext } from "../../context/AuthContext";
-//import styles from "../styles/editor.module.css";
+import styles from "../styles/editor.module.css";
 
 const EditorAdmin = () => {
-  const { token } = useContext(AuthContext);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const token = localStorage.getItem("token");
+  const isAdmin = localStorage.getItem("Admin") === "true"; // Verificar directamente en localStorage
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -19,20 +17,8 @@ const EditorAdmin = () => {
   const apiBaseUrl = "http://localhost:3508/api";
 
   useEffect(() => {
-    // Verificar si el usuario es administrador
-    const checkAdmin = async () => {
-      try {
-        const response = await axios.get(`${apiBaseUrl}/user/admin`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setIsAdmin(response.data.isAdmin);
-      } catch (error) {
-        console.error("Error al verificar administrador:", error);
-        setIsAdmin(false);
-      }
-    };
+    if (!isAdmin) return; // Si no es admin, no intentar cargar los datos
 
-    // Cargar categorías y ubicaciones
     const fetchData = async () => {
       try {
         const categoriesResponse = await axios.get(`${apiBaseUrl}/event-category`, {
@@ -49,9 +35,8 @@ const EditorAdmin = () => {
       }
     };
 
-    checkAdmin();
     fetchData();
-  }, [token]);
+  }, [token, isAdmin]);
 
   const handleDelete = async (type, id) => {
     try {
@@ -116,6 +101,7 @@ const EditorAdmin = () => {
     setShowModal(true);
   };
 
+  // Si no es admin, no mostrar nada
   if (!isAdmin) return <p>No tienes permisos para acceder a esta sección.</p>;
 
   return (

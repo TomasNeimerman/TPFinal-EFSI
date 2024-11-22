@@ -8,11 +8,12 @@ export default class Bd {
         this.client.connect();
     }
 
-     async autenticarUsuario(username, password) {
-        const sql = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}' `;        
+    async autenticarUsuario(username, password) {
+        const sql = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
         try {
             const respuesta = await this.client.query(sql);
-            return respuesta.rows;
+            console.log("Usuario " + username + " correcto");
+            return respuesta.rows; 
         } catch (error) {
             console.error("Error al autenticar usuario:", error);
             throw new Error("Error al autenticar usuario");
@@ -22,8 +23,8 @@ export default class Bd {
     async autenticarRegistro(first_name, last_name, username, password) {
         const num = await this.cantUsuarios()
         let id = parseInt(num[0].count)
-        const sql = `INSERT INTO users (id, first_name, last_name, username, password)
-            VALUES ('${id+1}', '${first_name}', '${last_name}', '${username}', '${password}')
+        const sql = `INSERT INTO users (id, first_name, last_name, username, password, admin)
+            VALUES ('${id+1}', '${first_name}', '${last_name}', '${username}', '${password}', 'false')
             RETURNING id`;
             console.log(sql)
         try {
@@ -58,7 +59,7 @@ export default class Bd {
     }
 
     async isAdmin(id){
-        const sql = `UPDATE users SET admin = true WHERE id='${id}' RETURNING *`
+        const sql = `SELECT * FROM users WHERE id='${id}' and admin=true`
         const response = await this.DBClient.query(sql);
         return response.rows
     }

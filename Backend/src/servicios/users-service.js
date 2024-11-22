@@ -5,7 +5,7 @@ const bd = new Bd();
 export default class UsuarioServicios {
     async login(username, password) {
         try {
-            const usuario = await bd.buscarUsuarioPorUsername(username);
+            const usuario = await bd.autenticarUsuario(username, password);
             if (usuario.length <= 0) {
                 return 400
             }   
@@ -47,10 +47,11 @@ export default class UsuarioServicios {
             throw new Error('Error interno del servidor');
         }
     }
-    isAdmin = async (id) =>{
-        const repo = bd
-        const returnArray = await repo.isAdmin(id);
-        return returnArray;
-    }
-
+    
+        isAdmin = async (id) => {
+            const repo = bd;
+            const isAdmin = await repo.isAdmin(id);
+            return isAdmin; // Retorna booleano
+        };
+    
 }
