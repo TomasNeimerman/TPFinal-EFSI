@@ -23,11 +23,13 @@ const EditorAdmin = () => {
       try {
         const categoriesResponse = await axios.get(`${apiBaseUrl}/event-category`, {
           headers: { Authorization: `Bearer ${token}` },
+          params: { limit: 10, offset: 0 }, // Enviar valores predeterminados
         });
         setCategories(categoriesResponse.data);
 
         const locationsResponse = await axios.get(`${apiBaseUrl}/event-location`, {
           headers: { Authorization: `Bearer ${token}` },
+          params: { limit: 10, offset: 0 }, // Enviar valores predeterminados
         });
         setLocations(locationsResponse.data);
       } catch (error) {
@@ -58,8 +60,8 @@ const EditorAdmin = () => {
   const handleSave = async () => {
     try {
       const endpoint = modalType === "category" ? "event-category" : "event-location";
-
       let response;
+  
       if (selectedItem) {
         // Actualización
         response = await axios.put(`${apiBaseUrl}/${endpoint}/${selectedItem.id}`, formData, {
@@ -71,7 +73,8 @@ const EditorAdmin = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
-
+  
+      // Actualizar estado local
       if (modalType === "category") {
         setCategories((prev) =>
           selectedItem
@@ -85,7 +88,8 @@ const EditorAdmin = () => {
             : [...prev, response.data]
         );
       }
-
+  
+      // Cerrar modal y reiniciar estado
       setShowModal(false);
       setSelectedItem(null);
       setFormData({});
@@ -101,7 +105,6 @@ const EditorAdmin = () => {
     setShowModal(true);
   };
 
-  // Si no es admin, no mostrar nada
   if (!isAdmin) return <p>No tienes permisos para acceder a esta sección.</p>;
 
   return (

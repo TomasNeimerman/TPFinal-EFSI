@@ -38,10 +38,10 @@ export default class EventLocationRepository{
     return response.rows;
 }
 async borrarEventLocation(id) {
-    const sql = `DELETE FROM events WHERE id_event_locations = '${id}';
-    DELETE FROM event_locations WHERE id = '${id}'`;
-    const response = await this.DBClient.query(sql);
-    return response.rows
-    }
+  const sql = `
+    DELETE FROM events WHERE id_event_location = '${id}';
+    DELETE FROM event_locations WHERE id = '${id}';
+  `;
+  await this.DBClient.query(sql);
 }
-    
+}
