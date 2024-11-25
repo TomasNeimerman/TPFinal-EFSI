@@ -11,14 +11,14 @@ const Header = () => {
     const username = localStorage.getItem('username') || 'Usuario';
 
     useEffect(() => {
-        const adminStatus = localStorage.getItem('isAdmin') === 'true'; // Verifica si es admin
+        const adminStatus = localStorage.getItem('Admin') === 'true'; // Verifica si es admin
         setIsAdmin(adminStatus);
     }, []);
 
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
-        localStorage.removeItem('Admin'); // Limpia el estado de admin
+        localStorage.removeItem('Admin');
         navigate('/');
     };
 

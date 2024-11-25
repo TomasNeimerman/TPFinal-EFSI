@@ -34,6 +34,7 @@ const EditorAdmin = () => {
         setLocations(locationsResponse.data);
       } catch (error) {
         console.error("Error al cargar datos:", error);
+        alert("Hubo un error al cargar los datos. Por favor, intenta nuevamente.");
       }
     };
 
@@ -54,27 +55,50 @@ const EditorAdmin = () => {
       }
     } catch (error) {
       console.error("Error al eliminar:", error);
+      alert("Hubo un error al eliminar el elemento. Por favor, intenta nuevamente.");
     }
   };
 
   const handleSave = async () => {
     try {
+      console.log("Botón 'Guardar' presionado");
+      console.log("Datos del formulario:", formData);
+
+      // Validaciones de datos
+      if (!formData.name || formData.name.trim().length < 3) {
+        console.error("Nombre inválido. Debe tener al menos 3 caracteres.");
+        alert("El nombre debe tener al menos 3 caracteres.");
+        return;
+      }
+      if (modalType === "location" && (!formData.full_address || formData.full_address.trim().length < 3)) {
+        console.error("Dirección inválida.");
+        alert("La dirección debe tener al menos 3 caracteres.");
+        return;
+      }
+      if (modalType === "location" && (!formData.max_capacity || formData.max_capacity <= 0)) {
+        console.error("Capacidad máxima inválida.");
+        alert("La capacidad máxima debe ser mayor a 0.");
+        return;
+      }
+
       const endpoint = modalType === "category" ? "event-category" : "event-location";
       let response;
-  
+
       if (selectedItem) {
-        // Actualización
+        console.log("Modo: Editar");
         response = await axios.put(`${apiBaseUrl}/${endpoint}/${selectedItem.id}`, formData, {
           headers: { Authorization: `Bearer ${token}` },
         });
       } else {
-        // Creación
+        console.log("Modo: Crear");
         response = await axios.post(`${apiBaseUrl}/${endpoint}`, formData, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
-  
-      // Actualizar estado local
+
+      console.log("Respuesta del servidor:", response.data);
+
+      // Actualizar estado local con los nuevos datos
       if (modalType === "category") {
         setCategories((prev) =>
           selectedItem
@@ -88,13 +112,15 @@ const EditorAdmin = () => {
             : [...prev, response.data]
         );
       }
-  
+
       // Cerrar modal y reiniciar estado
       setShowModal(false);
       setSelectedItem(null);
       setFormData({});
+      console.log("Guardado exitoso y modal cerrado");
     } catch (error) {
-      console.error("Error al guardar:", error);
+      console.error("Error en handleSave:", error.response?.data || error.message);
+      alert("Hubo un error al guardar. Verifica los datos ingresados y vuelve a intentar.");
     }
   };
 
